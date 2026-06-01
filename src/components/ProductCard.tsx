@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
-import type { ShopifyProduct } from "@/lib/shopify";
+import { shopifyImage, shopifyImageSrcSet, type ShopifyProduct } from "@/lib/shopify";
 
 export const ProductCard = ({ product }: { product: ShopifyProduct }) => {
   const addItem = useCartStore((s) => s.addItem);
@@ -10,6 +10,7 @@ export const ProductCard = ({ product }: { product: ShopifyProduct }) => {
   const node = product.node;
   const variant = node.variants.edges[0]?.node;
   const image = node.images.edges[0]?.node;
+  const hoverImage = node.images.edges[1]?.node;
   const price = parseFloat(node.priceRange.minVariantPrice.amount);
   const compareAt = variant?.compareAtPrice ? parseFloat(variant.compareAtPrice.amount) : null;
   const currency = node.priceRange.minVariantPrice.currencyCode;
@@ -38,16 +39,30 @@ export const ProductCard = ({ product }: { product: ShopifyProduct }) => {
       <div className="relative aspect-square overflow-hidden bg-secondary/40">
         {image && (
           <img
-            src={image.url}
+            src={shopifyImage(image.url, 800)}
+            srcSet={shopifyImageSrcSet(image.url)}
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             alt={image.altText ?? node.title}
             loading="lazy"
-            width={1024}
-            height={1024}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            width={800}
+            height={800}
+            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
+          />
+        )}
+        {hoverImage && (
+          <img
+            src={shopifyImage(hoverImage.url, 800)}
+            srcSet={shopifyImageSrcSet(hoverImage.url)}
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            alt=""
+            loading="lazy"
+            width={800}
+            height={800}
+            className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           />
         )}
         {discount && (
-          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-urgent text-urgent-foreground text-[11px] font-bold">
+          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-urgent text-urgent-foreground text-[11px] font-bold tracking-wide">
             -{discount}%
           </span>
         )}
@@ -55,8 +70,8 @@ export const ProductCard = ({ product }: { product: ShopifyProduct }) => {
           onClick={handleAdd}
           disabled={isLoading || !variant}
           size="icon"
-          className="absolute bottom-3 right-3 h-11 w-11 rounded-full bg-foreground text-background hover:bg-accent shadow-lift opacity-90 group-hover:opacity-100"
-          aria-label="Quick add"
+          className="absolute bottom-3 right-3 h-11 w-11 rounded-full bg-foreground text-background hover:bg-accent shadow-lift opacity-90 group-hover:opacity-100 z-10"
+          aria-label={`Quick add ${node.title}`}
         >
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-5 w-5" />}
         </Button>

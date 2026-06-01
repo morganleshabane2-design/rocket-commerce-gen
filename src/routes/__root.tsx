@@ -11,9 +11,10 @@ import {
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { CartDrawer } from "@/components/CartDrawer";
-import { RecentPurchasePopup } from "@/components/RecentPurchasePopup";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { useCartSync } from "@/hooks/useCartSync";
+
+const SITE_URL = "https://rocket-commerce-gen.lovable.app";
 
 function NotFoundComponent() {
   return (
@@ -58,16 +59,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Aurum — Tiny upgrades. Massive vibes." },
       { name: "description", content: "Trending TikTok-favorite gadgets with free US shipping and a 30-day guarantee." },
-      { property: "og:title", content: "Aurum — Tiny upgrades. Massive vibes." },
-      { property: "og:description", content: "Trending TikTok-favorite gadgets with free US shipping and a 30-day guarantee." },
+      { property: "og:site_name", content: "Aurum" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Aurum — Tiny upgrades. Massive vibes." },
-      { name: "twitter:description", content: "Trending TikTok-favorite gadgets with free US shipping and a 30-day guarantee." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ccd40323-1de8-401e-a027-f38c3122bd6d/id-preview-6dbbf896--1d5a1dcd-7ba2-47bb-9953-0fb226ab6eb2.lovable.app-1779991349878.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ccd40323-1de8-401e-a027-f38c3122bd6d/id-preview-6dbbf896--1d5a1dcd-7ba2-47bb-9953-0fb226ab6eb2.lovable.app-1779991349878.png" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "preconnect", href: "https://cdn.shopify.com" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Aurum",
+          url: SITE_URL,
+          sameAs: [],
+          contactPoint: { "@type": "ContactPoint", email: "support@aurum.shop", contactType: "customer support" },
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -90,7 +103,6 @@ function AppShell() {
     <>
       <Outlet />
       <CartDrawer />
-      <RecentPurchasePopup />
       <ExitIntentPopup />
       <Toaster position="top-center" />
     </>

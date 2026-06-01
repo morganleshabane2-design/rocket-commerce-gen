@@ -30,6 +30,19 @@ export interface ShopifyProduct {
   };
 }
 
+/** Append Shopify CDN sizing params. Safe no-op for non-Shopify URLs. */
+export function shopifyImage(url: string | undefined, width: number): string {
+  if (!url) return "";
+  if (!url.includes("cdn.shopify.com")) return url;
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}width=${width}`;
+}
+
+export function shopifyImageSrcSet(url: string | undefined, widths: number[] = [400, 800, 1200, 1600]): string {
+  if (!url) return "";
+  return widths.map((w) => `${shopifyImage(url, w)} ${w}w`).join(", ");
+}
+
 export async function storefrontApiRequest(query: string, variables: Record<string, unknown> = {}) {
   const response = await fetch(SHOPIFY_STOREFRONT_URL, {
     method: "POST",
@@ -59,8 +72,8 @@ const PRODUCT_FIELDS = `
   handle
   priceRange { minVariantPrice { amount currencyCode } }
   compareAtPriceRange { minVariantPrice { amount currencyCode } }
-  images(first: 5) { edges { node { url altText } } }
-  variants(first: 10) {
+  images(first: 6) { edges { node { url altText } } }
+  variants(first: 25) {
     edges {
       node {
         id title availableForSale
@@ -74,8 +87,8 @@ const PRODUCT_FIELDS = `
 `;
 
 const PRODUCTS_QUERY = `
-  query GetProducts($first: Int!) {
-    products(first: $first) {
+  query GetProducts($first: Int!, $query: String) {
+    products(first: $first, query: $query) {
       edges { node { ${PRODUCT_FIELDS} } }
     }
   }
@@ -87,8 +100,8 @@ const PRODUCT_BY_HANDLE_QUERY = `
   }
 `;
 
-export async function fetchProducts(first = 20): Promise<ShopifyProduct[]> {
-  const data = await storefrontApiRequest(PRODUCTS_QUERY, { first });
+export async function fetchProducts(first = 20, query?: string): Promise<ShopifyProduct[]> {
+  const data = await storefrontApiRequest(PRODUCTS_QUERY, { first, query });
   return data?.data?.products?.edges ?? [];
 }
 

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rocket-commerce-gen.lovable.app/sitemap.xml
