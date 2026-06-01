@@ -7,6 +7,8 @@ import { SocialProof } from "@/components/SocialProof";
 import { Guarantee } from "@/components/Guarantee";
 import { Footer } from "@/components/Footer";
 
+const SITE_URL = "https://rocket-commerce-gen.lovable.app";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -14,7 +16,9 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Shop trending viral products. Free US shipping, 24h dispatch, 30-day money-back guarantee." },
       { property: "og:title", content: "Aurum — Tiny upgrades. Massive vibes." },
       { property: "og:description", content: "Shop trending viral products. Free US shipping, 24h dispatch, 30-day money-back guarantee." },
+      { property: "og:url", content: SITE_URL + "/" },
     ],
+    links: [{ rel: "canonical", href: SITE_URL + "/" }],
   }),
   component: Index,
 });

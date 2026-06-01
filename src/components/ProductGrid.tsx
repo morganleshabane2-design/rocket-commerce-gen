@@ -1,6 +1,5 @@
 import { useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "./ProductCard";
-import { CountdownTimer } from "./CountdownTimer";
 import { Loader2 } from "lucide-react";
 
 export const ProductGrid = () => {
@@ -11,15 +10,14 @@ export const ProductGrid = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
-            <p className="text-xs uppercase tracking-widest text-accent font-semibold mb-3">The drop</p>
-            <h2 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-balance">
+            <p className="text-xs uppercase tracking-[0.2em] text-accent font-semibold mb-3">The drop</p>
+            <h2 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-balance max-w-2xl">
               This week's obsessions.
             </h2>
           </div>
-          <div className="flex flex-col gap-2 md:items-end">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground">Sale ends in</span>
-            <CountdownTimer minutes={47} />
-          </div>
+          <p className="text-sm text-muted-foreground max-w-xs md:text-right">
+            Curated, tested, and shipped from our US warehouse. No drop-shipping nonsense.
+          </p>
         </div>
 
         {isLoading ? (
