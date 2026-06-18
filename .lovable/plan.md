@@ -1,81 +1,59 @@
+## Full overhaul plan — bugs, polish, CRO, features
 
-# Aurum Storefront — Full Overhaul Plan
+A complete pass across the store. Every section is in scope.
 
-A coordinated upgrade across visual design, conversion stack, SEO/performance, and new features. Built on the existing TanStack Start + Shopify Storefront API setup.
+### 1. Bug audit & fixes
+- Sweep every component/route for runtime errors, stale imports, broken types, and dead code (after the `RecentPurchasePopup` ghost import already fixed).
+- Verify cart flow end-to-end with Playwright: add → drawer → quantity change → remove → checkout URL has `channel=online_store` and opens in a new tab.
+- Verify PDP `product.$handle.tsx`: image gallery, variant switching, quantity stepper, sticky mobile buy bar, cross-sell rail.
+- Verify Header/AnnouncementBar scroll behavior, mobile nav, cart badge animation, ExitIntentPopup trigger logic.
+- Fix any console errors, hydration warnings, missing keys, accessibility violations (alt text, button labels, focus states).
+- Remove unused components / dead code (e.g. confirm `SocialProof` content is real vs fabricated — per policy, no fake reviews).
 
-## 1. Visual design polish
+### 2. Visual polish
+- Audit `src/styles.css` tokens: ensure cohesive palette (oklch), typography pair (editorial display + clean body via `@fontsource`), spacing scale, shadow & gradient tokens.
+- Hero: refine motion (framer-motion), composition, image treatment, CTA hierarchy.
+- ProductCard: hover image swap, price/compare-at treatment, badge system (New/Best seller — only if backed by real Shopify tags).
+- PDP: gallery polish, variant pills, trust row, accordion sections, sticky buy bar timing.
+- CartDrawer: free-shipping progress bar styling, upsell rail, savings breakdown.
+- Footer: clean column layout, newsletter input, social links.
+- Consistent focus rings, transitions, and reduced-motion support.
 
-- **New hero direction**: editorial split layout with large product photography on one side, oversized display typography on the other. Replace generic centered hero. Add subtle scroll-driven motion (framer-motion) on the headline.
-- **Typography upgrade**: pair an Awwwards-grade display font (e.g. PP Editorial / Fraunces) with Inter Tight body. Add expressive type scale and balanced tracking.
-- **Refined token system in `src/styles.css`**: layered surfaces, accent gradient, soft shadows, premium oklch palette (warm off-white + deep ink + single saturated accent).
-- **Polished product cards**: hover image swap (2nd Shopify image), price reveal animation, "Add to bag" inline action.
-- **Sticky transparent header** that solidifies on scroll, with cart count animation.
+### 3. Conversion (CRO)
+- Real Shopify discount code (e.g. `WELCOME10`, 10% off) via `shopify--create_price_rule` + `shopify--create_discount_code`, surfaced in AnnouncementBar + ExitIntentPopup.
+- Free-shipping threshold pulled from a single config constant; progress bar in cart.
+- Upsell rail in cart (real products, not pseudo).
+- PDP cross-sell rail (real products).
+- Reviews UI: empty-state only ("No reviews yet"), no fabricated content.
+- Trust row (shipping, returns, support) — factual copy only.
 
-## 2. Conversion & CRO stack
+### 4. New features
+- `/collections/$handle` route with Shopify collection query.
+- `/search` route using Shopify `products(query:)`.
+- Newsletter capture via Lovable Cloud (`newsletter_signups` table with RLS) — wired into Footer + ExitIntentPopup.
+- Order lookup stub link in Footer.
+- Better 404 illustration/copy.
 
-- **Product Detail Page upgrade**
-  - Image gallery with thumbnails + zoom on hover.
-  - Variant selector (size/color swatches from `selectedOptions`) with availability per variant.
-  - Quantity stepper.
-  - Trust row (shipping / returns / guarantee) with icons.
-  - Sticky "Add to bag" on mobile that mirrors the chosen variant + price.
-  - "Frequently bought together" / cross-sell rail pulling other Shopify products.
-  - Accordion sections: Ingredients/Specs, Shipping, FAQ.
-- **Cart drawer upgrade**
-  - Free-shipping progress bar ("$X away from free shipping").
-  - Upsell rail inside drawer (one-click add other products).
-  - Subtotal + savings breakdown + applied discount code field.
-  - Express checkout button styled prominently; `channel=online_store` preserved.
-- **Site-wide nudges (kept tasteful, not spammy)**
-  - Replace fake countdown + fake "recent purchase" popups (they hurt trust). Keep only honest urgency (real low-stock when Shopify reports it).
-  - Announcement bar with rotating real value props (free US shipping, 30-day returns, 24h dispatch).
-  - Exit-intent stays but offers a real, working Shopify discount code created via the API.
-- **Reviews UI** — empty-state structure only ("No reviews yet"), per policy. No fake reviews.
+### 5. SEO & performance
+- Per-route unique `head()` for every page (index, about, faq, product, collection, search, 404).
+- JSON-LD: Organization (root), Product (PDP from loader data), BreadcrumbList (PDP/collection), FAQPage (FAQ).
+- `og:image` only at leaf routes; product OG image = product image.
+- Dynamic `sitemap.xml` includes products + collections from Shopify.
+- LCP image: `fetchpriority="high"` + `rel=preload` on hero/PDP main image.
+- `font-display: swap` via @fontsource, defer non-critical JS, lazy-load below-the-fold images.
+- Validate `robots.txt` and canonical tags on every leaf route.
 
-## 3. New features
+### Technical notes
+- New components: `CollectionGrid`, `SearchModal`, `NewsletterForm`, `ProductJsonLd`, `Breadcrumbs`, `EmptyReviews`.
+- New routes: `src/routes/collections.$handle.tsx`, `src/routes/search.tsx`.
+- Lovable Cloud enabled for `newsletter_signups` (id, email unique, created_at) with RLS + GRANTs to `anon` INSERT only.
+- Shopify discount code created with starts_at blank, no end date, 10% across line items.
+- Verify with Playwright: home, PDP, cart add+checkout link, collection, search, newsletter signup.
 
-- **Collections / category routes** (`/collections/$handle`) using Shopify Storefront `collectionByHandle`.
-- **Search** — header search modal hitting Shopify `products(query:)`.
-- **Bundles page** (`/bundles`) — curated multi-product offer; real Shopify discount code applied.
-- **About** (`/about`) and **FAQ** (`/faq`) routes for trust + SEO surface area.
-- **Email capture** at footer, persisted (Lovable Cloud table — newsletter_signups) with RLS. Confirms via toast.
-- **Order lookup** stub linking to Shopify order status page.
+### Suggested build order
+1. Bug sweep + dev-server clean → 2. Design tokens & typography → 3. Hero/Header/Footer polish → 4. PDP + Cart polish → 5. Collections + Search routes → 6. Newsletter (Cloud) → 7. Real discount code + AnnouncementBar wiring → 8. SEO/JSON-LD/sitemap → 9. Playwright verification pass.
 
-## 4. SEO & performance
-
-- **Per-route `head()`** with unique title/description/og on `/`, `/about`, `/faq`, `/collections/$handle`, `/product/$handle`, `/bundles`.
-- **JSON-LD**: Organization on root, Product schema on PDP (name, image, offers.price, availability), BreadcrumbList on deep routes, FAQPage on `/faq`.
-- **Dynamic `sitemap.xml`** server route enumerating routes + all Shopify products + collections.
-- **`robots.txt`** allowing all, pointing to sitemap.
-- **Image optimization**: explicit width/height to kill CLS, `loading="lazy"` below the fold, `fetchpriority="high"` + preload for hero LCP image, Shopify CDN `?width=` params for responsive `srcset`.
-- **Fonts**: `font-display: swap`, preconnect to font host.
-- **Defer non-critical work**: lazy-mount ExitIntentPopup and announcement rotator.
-- **Canonical tags** on every leaf route; remove from root.
-
-## 5. Cleanup / removals
-
-- Remove fake countdown + fake recent-purchase popup (replace with real Shopify-driven signals).
-- Consolidate duplicate trust strips into a single shared component.
-- Audit unused assets (`aurora.jpg`, `slides.jpg`, `posture.jpg`) and remove if unreferenced after redesign.
-
-## Technical notes
-
-- **Stack**: TanStack Start, TanStack Query, Zustand cart, Shopify Storefront API 2025-07 — unchanged.
-- **New routes**: `src/routes/about.tsx`, `src/routes/faq.tsx`, `src/routes/collections.$handle.tsx`, `src/routes/bundles.tsx`, `src/routes/sitemap[.]xml.ts`.
-- **New lib**: extend `src/lib/shopify.ts` with `fetchCollections`, `fetchCollectionByHandle`, `searchProducts`.
-- **New components**: `AnnouncementBar`, `SearchModal`, `VariantSelector`, `FreeShippingBar`, `UpsellRail`, `ProductJsonLd`, `NewsletterForm`.
-- **Backend**: enable Lovable Cloud for `newsletter_signups` table (id, email unique, created_at) with insert-only RLS for anon.
-- **Real discount code**: create via `shopify--create_discount_code` (e.g. `WELCOME10`) and surface in exit-intent + newsletter confirmation.
-- **PDP head()** derives og:image from the product's first Shopify image; canonical from handle.
-
-## Suggested build order
-
-1. Design tokens + typography + hero/header redesign.
-2. PDP overhaul (gallery, variants, sticky bar, cross-sell).
-3. Cart drawer upgrades (free-ship bar, upsell, discount field).
-4. New routes (collections, search, about, faq, bundles) + nav wiring.
-5. SEO pass (per-route head, JSON-LD, sitemap, robots, image perf).
-6. Cleanup (remove fake urgency, prune assets).
-7. Lovable Cloud newsletter table + real Shopify discount code.
-
-Approve and I'll start in this order, checking in after each phase.
+### Out of scope
+- Real review integration (Judge.me/Yotpo) — requires user account.
+- Payment customization beyond Shopify checkout.
+- Custom domain / DNS.
