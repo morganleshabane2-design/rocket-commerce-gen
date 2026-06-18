@@ -4,7 +4,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Minus, Plus, Trash2, ExternalLink, Loader2, ShoppingBag, ShieldCheck } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { shopifyImage } from "@/lib/shopify";
-import { FreeShippingBar } from "./FreeShippingBar";
+import { FreeShippingBar, FREE_SHIPPING_THRESHOLD } from "./FreeShippingBar";
 import { UpsellRail } from "./UpsellRail";
 
 export const CartDrawer = () => {
@@ -109,7 +109,7 @@ export const CartDrawer = () => {
                 )}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span className="font-medium">{totalPrice >= 50 ? "FREE" : "Calculated at checkout"}</span>
+                  <span className="font-medium">{totalPrice >= FREE_SHIPPING_THRESHOLD ? "FREE" : "Calculated at checkout"}</span>
                 </div>
                 <div className="flex justify-between items-baseline pt-2 border-t">
                   <span className="text-sm uppercase tracking-wider text-muted-foreground">Total</span>

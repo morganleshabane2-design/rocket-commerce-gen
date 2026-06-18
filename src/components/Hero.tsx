@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Sparkles, Star } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProducts } from "@/hooks/useProducts";
 import { shopifyImage, shopifyImageSrcSet } from "@/lib/shopify";
@@ -71,24 +71,11 @@ export const Hero = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.45 }}
-            className="mt-10 flex items-center gap-5 text-xs text-muted-foreground"
+            className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground"
           >
-            <div className="flex -space-x-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="w-8 h-8 rounded-full border-2 border-background bg-gradient-to-br from-accent/40 to-foreground/20"
-                />
-              ))}
-            </div>
-            <div>
-              <div className="flex items-center gap-0.5 text-foreground">
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-accent text-accent" />
-                ))}
-              </div>
-              <p className="mt-0.5">Loved by thousands across the US</p>
-            </div>
+            <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-accent" /> Free US shipping</span>
+            <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-accent" /> Ships in 24h</span>
+            <span className="inline-flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-accent" /> 30-day refund</span>
           </motion.div>
         </div>
 

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -75,14 +75,13 @@ function ProductPage() {
   const [activeImage, setActiveImage] = useState(0);
 
   // Initialize variant selection on first load
-  useMemo(() => {
+  useEffect(() => {
     if (!product) return;
     const firstVariant = product.node.variants.edges[0]?.node;
-    if (firstVariant) {
-      const init: Record<string, string> = {};
-      firstVariant.selectedOptions.forEach((o) => { init[o.name] = o.value; });
-      setSelectedOptions(init);
-    }
+    if (!firstVariant) return;
+    const init: Record<string, string> = {};
+    firstVariant.selectedOptions.forEach((o) => { init[o.name] = o.value; });
+    setSelectedOptions(init);
   }, [product]);
 
   if (isLoading) {
@@ -236,7 +235,7 @@ function ProductPage() {
               <AccordionItem value="ship">
                 <AccordionTrigger className="text-sm font-semibold">Shipping &amp; delivery</AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground">
-                  Ships from our US warehouse within 24 hours (Mon–Fri). Standard delivery 2–5 business days. Free over $0.
+                  Ships from our US warehouse within 24 hours (Mon–Fri). Standard delivery 2–5 business days. Free US shipping on orders $50+.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="returns">
