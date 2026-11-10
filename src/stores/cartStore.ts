@@ -104,7 +104,11 @@ export const useCartStore = create<CartStore>()(
           const result = await removeLineFromShopifyCart(cartId, item.lineId);
           if (result.success) {
             const next = get().items.filter((i) => i.variantId !== variantId);
-            next.length === 0 ? clearCart() : set({ items: next });
+            if (next.length === 0) {
+              clearCart();
+            } else {
+              set({ items: next });
+            }
           } else if (result.cartNotFound) clearCart();
         } finally {
           set({ isLoading: false });
